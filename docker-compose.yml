@@ -11,6 +11,7 @@ services:
       - MONGO_URI=${MONGO_URI}
       - JWT_SECRET=${JWT_SECRET}
       - NODE_ENV=${NODE_ENV}
+      - MONGOMS_VERSION=7.0.3
     networks:
       - natlife-network
 
