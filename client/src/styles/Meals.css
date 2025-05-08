@@ -1,0 +1,67 @@
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  background: var(--surface);
+  border-radius: 6px;
+  color: var(--text);
+}
+
+.day-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.day-tab {
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  color: var(--text);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.day-tab.active {
+  background: var(--primary);
+}
+
+.meal-cards {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.meal-card {
+  background: var(--surface);
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.meal-header {
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.meal-table {
+  width: 100%;
+  background: none;
+  color: var(--text);
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.meal-table thead tr {
+  color: var(--primary);
+  font-size: 0.95em;
+}
+
+.meal-table th,
+.meal-table td {
+  text-align: left;
+  padding: 0.25rem 0.5rem;
+}
+
+.meal-table tbody tr {
+  border-top: 1px solid var(--border);
+} 

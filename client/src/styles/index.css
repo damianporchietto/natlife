@@ -1,0 +1,71 @@
+/* Import theme variables */
+@import './theme.css';
+
+/* Import component styles */
+@import './App.css';
+@import './Header.css';
+@import './Footer.css';
+@import './ThemeToggle.css';
+@import './Meals.css';
+@import './Workouts.css';
+@import './Reports.css';
+
+/* Additional global styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text);
+  margin-top: 0;
+}
+
+button {
+  font-family: Inter, Arial, sans-serif;
+  cursor: pointer;
+}
+
+/* Remove the default button styles */
+button:focus {
+  outline: none;
+}
+
+/* Add transitions for theme switching */
+body, input, button, table, div {
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+/* Primary button style */
+.btn-primary {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+/* Secondary button style */
+.btn-secondary {
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+/* Card style */
+.card {
+  background-color: var(--surface);
+  border-radius: 6px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+} 

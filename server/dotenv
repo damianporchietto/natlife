@@ -1,0 +1,5 @@
+MONGO_URI=mongodb://localhost:27017/natlife
+PORT=5000
+JWT_SECRET=a_very_secure_jwt_secret
+JWT_EXPIRE=1d
+NODE_ENV=development
