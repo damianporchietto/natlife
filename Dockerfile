@@ -1,5 +1,5 @@
 # Test stage
-FROM node:18-alpine AS test-stage
+FROM node:18 AS test-stage
 WORKDIR /app/server
 COPY server/package*.json ./
 RUN npm install --verbose
@@ -7,7 +7,7 @@ COPY server/ ./
 RUN npm test --verbose -- --verbose
 
 # Build stage for client
-FROM node:18-alpine AS client-builder
+FROM node:18 AS client-builder
 WORKDIR /app/client
 COPY client/package*.json ./
 RUN npm install --verbose
@@ -16,7 +16,7 @@ RUN npm run build --verbose
 RUN ls -la dist/
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:18 AS production
 WORKDIR /app
 
 # Copy server files
