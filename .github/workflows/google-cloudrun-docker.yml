@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: 'your-gcp-project-id'
-  REGION: 'us-central1'
-  SERVICE: 'your-cloudrun-service-name'
-  REPOSITORY: 'your-artifact-registry-repo'
-  WORKLOAD_IDENTITY_PROVIDER: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider' # <-- CHANGE THIS
+  REGION: ${{ secrets.GCP_REGION }}
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  SERVICE: ${{ secrets.GCP_SERVICE }}
+  REPOSITORY: ${{ secrets.GCP_REPOSITORY }}
+  WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
 
 jobs:
   deploy:
@@ -22,7 +22,7 @@ jobs:
       id-token: 'write'
 
     steps:
-      - name: 'Checkout'
+      - name: 'Checkout Code'
         uses: actions/checkout@v4
 
       - id: 'auth'
@@ -32,14 +32,14 @@ jobs:
           workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
           service_account: 'github-actions@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
 
-      - name: 'Docker Auth'
+      - name: 'Docker Login to Artifact Registry'
         uses: docker/login-action@v3
         with:
           username: 'oauth2accesstoken'
           password: '${{ steps.auth.outputs.access_token }}'
           registry: '${{ env.REGION }}-docker.pkg.dev'
 
-      - name: 'Build and Push Container'
+      - name: 'Build and Push Docker Image'
         run: |
           IMAGE_URI="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}"
           docker build -t "$IMAGE_URI" .
@@ -57,5 +57,5 @@ jobs:
           region: '${{ env.REGION }}'
           image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}'
 
-      - name: 'Show output'
-        run: echo ${{ steps.deploy.outputs.url }} 
+      - name: 'Show Deployment URL'
+        run: echo "Service URL: ${{ steps.deploy.outputs.url }}"
