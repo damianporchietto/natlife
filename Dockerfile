@@ -2,17 +2,17 @@
 FROM node:20 AS test-stage
 WORKDIR /app/server
 COPY server/package*.json ./
-RUN npm install --verbose
+RUN npm install
 COPY server/ ./
-RUN npm test --verbose -- --verbose
+RUN npm test --verbose
 
 # Build stage for client
 FROM node:20 AS client-builder
 WORKDIR /app/client
 COPY client/package*.json ./
-RUN npm install --verbose
+RUN npm install
 COPY client/ ./
-RUN npm run build --verbose
+RUN npm run build
 RUN ls -la dist/
 
 # Production stage
@@ -21,7 +21,7 @@ WORKDIR /app
 
 # Copy server files
 COPY server/package*.json ./
-RUN npm install --verbose
+RUN npm install
 COPY server/ ./
 
 # Copy client build to the correct location
