@@ -42,11 +42,20 @@ jobs:
           username: oauth2accesstoken
           password: ${{ steps.auth.outputs.access_token }}
 
-      - name: Build and push Docker image
+      - name: Build Docker image
+        id: build
         run: |
           IMAGE_URI="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}"
           docker build -t "$IMAGE_URI" .
-          docker push "$IMAGE_URI"
+          echo "image_uri=$IMAGE_URI" >> $GITHUB_OUTPUT
+
+      - name: Run tests in container
+        run: |
+          docker run --rm ${{ steps.build.outputs.image_uri }} npm test
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ steps.build.outputs.image_uri }}
 
       - name: Deploy to Cloud Run
         id: deploy
@@ -54,7 +63,7 @@ jobs:
         with:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
-          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}
+          image: ${{ steps.build.outputs.image_uri }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           env_vars: |
             MONGO_URI=${{ secrets.MONGO_URI }}
@@ -64,6 +73,5 @@ jobs:
 
       - name: 'Show output'
         run: |2-
-
           echo ${{ steps.deploy.outputs.url }}
 
