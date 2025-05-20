@@ -1,3 +1,5 @@
+require("./instrument.js")
+const Sentry = require("@sentry/node")
 const express = require('express')
 const path = require('path')
 const dotenv = require('dotenv')
@@ -52,11 +54,21 @@ app.use(express.static(clientBuildPath, {
   }
 }));
 
+app.get("/api/debug-sentry", function mainHandler(req, res) {
+  throw new Error("My first Sentry error!");
+});
+
+Sentry.setupExpressErrorHandler(app)
+
+app.use(function onError(err, req, res, next) {
+  res.statusCode = 500
+  res.end(res.sentry + "\n")
+})
+
 app.get('*', (req, res) => {
   const indexPath = path.join(clientBuildPath, 'index.html');
-  console.log('Serving index from:', indexPath);
   res.sendFile(indexPath);
-});
+})
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`))

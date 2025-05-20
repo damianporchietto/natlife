@@ -1,4 +1,0 @@
-MONGO_URI=mongodb+srv://mongo-uri
-PORT=5000
-JWT_SECRET=jwt-secret
-NODE_ENV=production
