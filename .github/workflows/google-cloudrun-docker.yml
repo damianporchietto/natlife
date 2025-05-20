@@ -26,9 +26,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Clear gcloud Credentials
-        run: gcloud auth revoke --all
-        
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
