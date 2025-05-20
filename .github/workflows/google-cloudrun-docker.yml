@@ -1,4 +1,4 @@
-name: 'Build and Deploy to Cloud Run'
+name: Deploy to Cloud Run
 
 on:
   push:
@@ -7,11 +7,12 @@ on:
   workflow_dispatch:
 
 env:
-  REGION: ${{ secrets.GCP_REGION }}
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: ${{ secrets.GCP_REGION }}
   SERVICE: ${{ secrets.GCP_SERVICE }}
   REPOSITORY: ${{ secrets.GCP_REPOSITORY }}
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+  SERVICE_ACCOUNT_EMAIL: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
 
 jobs:
   deploy:
@@ -22,33 +23,36 @@ jobs:
       id-token: 'write'
 
     steps:
-      - name: 'Checkout Code'
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
+      - name: Authenticate to Google Cloud
+        id: auth
         uses: google-github-actions/auth@v2
         with:
+          token_format: 'access_token'
           workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: github-actions@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+          service_account: ${{ env.SERVICE_ACCOUNT_EMAIL }}
 
-      - name: 'Docker Login to Artifact Registry'
+      - name: Login to Artifact Registry
         uses: docker/login-action@v3
         with:
-          username: 'oauth2accesstoken'
-          password: ${{ steps.auth.outputs.access_token }}
           registry: ${{ env.REGION }}-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
 
-      - name: 'Build and Push Docker Image'
+      - name: Build and push Docker image
         run: |
           IMAGE_URI="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}"
           docker build -t "$IMAGE_URI" .
           docker push "$IMAGE_URI"
 
-      - name: 'Deploy to Cloud Run'
-        id: deploy
+      - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}
+
+      - name: Show Service URL
+        run: echo "Service URL: ${{ steps.deploy.outputs.url }}"
