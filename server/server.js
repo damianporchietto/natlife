@@ -14,6 +14,18 @@ connectDB()
 const app = express()
 app.use(express.json())
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  const uptime = process.uptime()
+  const days = Math.floor(uptime / 86400)
+  const hours = Math.floor((uptime % 86400) / 3600)
+  const minutes = Math.floor((uptime % 3600) / 60)
+  const seconds = Math.floor(uptime % 60)
+  
+  const uptimeString = `${days}d ${hours}h ${minutes}m ${seconds}s`
+  res.status(200).send(`OK - Uptime: ${uptimeString}`)
+})
+
 // Swagger Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
   explorer: true,

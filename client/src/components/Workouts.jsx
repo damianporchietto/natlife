@@ -85,22 +85,28 @@ export default function Workouts({ plans = [] }) {
                         className="exercise-row"
                       >
                         <div>{ex.name}</div>
-                        <input
-                          type='number'
-                          step='.5'
-                          value={state.w}
-                          placeholder={ex.suggestedWeight ?? ''}
-                          onChange={e => handleInputChange(key, 'w', e.target.value)}
-                          className="exercise-input"
-                        />
-                        <input
-                          type='number'
-                          step='1'
-                          value={state.r}
-                          placeholder={ex.suggestedReps ?? ''}
-                          onChange={e => handleInputChange(key, 'r', e.target.value)}
-                          className="exercise-input"
-                        />
+                        <div className="exercise-input-group">
+                          <label>Current Weight (kg)</label>
+                          <input
+                            type='number'
+                            step='.5'
+                            value={state.w}
+                            placeholder={ex.suggestedWeight ?? ''}
+                            onChange={e => handleInputChange(key, 'w', e.target.value)}
+                            className="exercise-input"
+                          />
+                        </div>
+                        <div className="exercise-input-group">
+                          <label>Current Reps</label>
+                          <input
+                            type='number'
+                            step='1'
+                            value={state.r}
+                            placeholder={ex.suggestedReps ?? ''}
+                            onChange={e => handleInputChange(key, 'r', e.target.value)}
+                            className="exercise-input"
+                          />
+                        </div>
                         <button
                           onClick={() => patch(plan._id, di, ei)}
                           className="exercise-button"
