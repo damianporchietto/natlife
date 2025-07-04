@@ -1,0 +1,67 @@
+name: Create Release Tag
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Check if version changed
+      id: version-check
+      run: |
+        # Get version from server package.json
+        SERVER_VERSION=$(jq -r '.version' server/package.json)
+        CLIENT_VERSION=$(jq -r '.version' client/package.json)
+        
+        echo "Server version: $SERVER_VERSION"
+        echo "Client version: $CLIENT_VERSION"
+        
+        # Check if versions match
+        if [ "$SERVER_VERSION" != "$CLIENT_VERSION" ]; then
+          echo "❌ Version mismatch between server and client"
+          exit 1
+        fi
+        
+        # Check if tag already exists
+        if git tag -l "v$SERVER_VERSION" | grep -q "v$SERVER_VERSION"; then
+          echo "Tag v$SERVER_VERSION already exists"
+          echo "create-tag=false" >> $GITHUB_OUTPUT
+        else
+          echo "New version detected: $SERVER_VERSION"
+          echo "create-tag=true" >> $GITHUB_OUTPUT
+          echo "version=$SERVER_VERSION" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create Release
+      if: steps.version-check.outputs.create-tag == 'true' && github.event_name == 'push'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.version-check.outputs.version }}
+        release_name: Release v${{ steps.version-check.outputs.version }}
+        body: |
+          ## Changes in v${{ steps.version-check.outputs.version }}
+          
+          - Server version: ${{ steps.version-check.outputs.version }}
+          - Client version: ${{ steps.version-check.outputs.version }}
+          
+          See [CHANGELOG.md](CHANGELOG.md) for detailed changes.
+          
+          ### Docker Images
+          - Server: Built and deployed
+          - Client: Built and deployed
+          
+          ### Deployment
+          - Google Cloud Run: Automatically deployed
+        draft: false
+        prerelease: false 
